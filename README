@@ -1,0 +1,194 @@
+go-kratos-test:
+https://github.com/atreya2011/go-kratos-test/tree/hydra-consent
+
+
+https://ap-south-1.console.aws.amazon.com/ec2/home?region=ap-south-1#InstanceDetails:instanceId=i-0c2a7a850b0f7ac2e
+
+Public ip 13.126.102.157
+pem file ~/.ssh/aws_dev_ory.pem 
+
+
+Login to AWS
+------------
+Instance ID
+i-0c2a7a850b0f7ac2e (Dev Ory Services)
+Open an SSH client.
+
+Locate your private key file. The key used to launch this instance is dev_ory.pem
+
+Run this command, if necessary, to ensure your key is not publicly viewable.
+ chmod 400 dev_ory.pem
+
+Connect to your instance using its Public DNS:
+ ec2-13-126-102-157.ap-south-1.compute.amazonaws.com
+
+Example:
+
+ ssh -i ~/.ssh/aws_dev_ory.pem ec2-user@ec2-13-126-102-157.ap-south-1.compute.amazonaws.com
+
+Downloaded code and scped to machine
+scp  -i ~/.ssh/aws_dev_ory.pem go-kratos-test-hydra-consent.zip  ec2-user@ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:
+
+
+Followed this 
+https://www.cyberciti.biz/faq/how-to-install-docker-on-amazon-linux-2/
+1. Install docker in EC2
+2. Installed docker-compose using wget commands 
+3. Started docker services as in document 
+
+
+Following instructions to Start the services
+--------------------------------------------
+https://github.com/atreya2011/go-kratos-test/blob/hydra-consent/README.md
+
+
+ [ec2-user@ip-172-31-9-178 go-kratos-test-hydra-consent]$ docker ps
+CONTAINER ID   IMAGE                                          COMMAND                  CREATED          STATUS          PORTS                                                                                                      NAMES
+b9cc8b1d44bb   go-kratos-test-hydra-consent-self-service-go   "/bin/sh -c 'wait-fo…"   16 seconds ago   Up 10 seconds   0.0.0.0:4455->4455/tcp, :::4455->4455/tcp                                                                  self-service-go
+f99daef3e29f   oryd/hydra:v1.11.8                             "hydra serve -c /etc…"   16 seconds ago   Up 9 seconds    0.0.0.0:4444-4445->4444-4445/tcp, :::4444-4445->4444-4445/tcp, 0.0.0.0:5555->5555/tcp, :::5555->5555/tcp   hydra
+dac4f52380f9   oryd/kratos:v0.10.1                            "kratos serve -c /et…"   16 seconds ago   Up 13 seconds   0.0.0.0:4433-4434->4433-4434/tcp, :::4433-4434->4433-4434/tcp                                              kratos
+58bcbe5a9e5b   postgres:alpine                                "docker-entrypoint.s…"   16 seconds ago   Up 15 seconds   0.0.0.0:5432->5432/tcp, :::5432->5432/tcp                                                                  auth-db
+bdf20679fa94   oryd/mailslurper:latest-smtps                  "./mailslurper"          16 seconds ago   Up 15 seconds   2500/tcp, 8080/tcp, 8085/tcp, 0.0.0.0:4436-4437->4436-4437/tcp, :::4436-4437->4436-4437/tcp                go-kratos-test-hydra-consent-mailslurper-1
+
+[ec2-user@ip-172-31-9-178 go-kratos-test-hydra-consent]$ curl -X POST 'http://localhost:4445/clients' \
+> -H 'Content-Type: application/json' \
+> --data-raw '{
+>   "client_id": "auth-code-client",
+>   "client_name": "Test OAuth2 Client",
+>   "client_secret": "secret",
+>   "grant_types": ["authorization_code", "refresh_token"],
+>   "redirect_uris": ["http://localhost:4455/dashboard"],
+>   "response_types": ["code", "id_token"],
+>   "scope": "openid offline",
+>   "token_endpoint_auth_method": "client_secret_post",
+>   "metadata": {"registration": true, "consent": true}
+> }'
+{"client_id":"auth-code-client","client_name":"Test OAuth2 Client","client_secret":"secret","redirect_uris":["http://localhost:4455/dashboard"],"grant_types":["authorization_code","refresh_token"],"response_types":["code","id_token"],"scope":"openid offline","audience":[],"owner":"","policy_uri":"","allowed_cors_origins":[],"tos_uri":"","client_uri":"","logo_uri":"","contacts":null,"client_secret_expires_at":0,"subject_type":"public","jwks":{},"token_endpoint_auth_method":"client_secret_post","userinfo_signed_response_alg":"none","created_at":"2023-01-17T16:01:07Z","updated_at":"2023-01-17T16:01:07.534226Z","metadata":{"registration":true,"consent":true},"registration_access_token":"VasnwMTEf2gZh_tapsEaOuc4L8TLdHNzbd1tMxuQsSg.1oaJOBJKyoGH_DnzeWhLlF1JgjzERVOR_deatsvO7iY","registration_client_uri":"http://localhost:4444/oauth2/register/auth-code-client"}
+
+
+
+-------------------
+
+All ports (as in docker ps) exposed editing its Security Groups
+
+go-kratos-test-hydra-consent-self-service-go
+http://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:4455/login
+
+
+
+kratos - 
+Public https://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:4433/
+Admin https://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:4434/
+
+Hydra -
+Public https://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:4444/
+      * http://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:4444/oauth2/register/auth-code-client
+Admin https://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:4445/
+
+Token User https://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:5555/
+
+Postgress
+postgres://auth:secret@ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:5432/auth?sslmode=disable&max_conns=20&max_idle_conns=4
+
+postgres://auth:secret@ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:5432/auth
+
+
+Mail Slurper - UI
+http://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:4436/
+
+Mail Sluper - API (?) 
+http://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:4437/
+----------------------
+
+Changed Config files in ./config (AWS) from localhost to public dns name
+
+docker-compose down  --rmi all
+
+
+http://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:4455/login
+
+
+redirects to 
+
+http://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:4444/oauth2/auth?client_id=auth-code-client&redirect_uri=http%3A%2F%2Fec2-13-126-102-157.ap-south-1.compute.amazonaws.com%3A4455%2Fdashboard&response_type=code&scope=openid+offline&state=HWTDrWGAFhInhiuXBityD9PGTDuCDGZSozhvB5rOpJg%3D
+
+http://localhost:4444/oauth2/auth?client_id=auth-code-client&redirect_uri=http%3A%2F%2Flocalhost%3A4455%2Fdashboard&response_type=code&scope=openid+offline&state=HWTDrWGAFhInhiuXBityD9PGTDuCDGZSozhvB5rOpJg%3D
+
+
+
+curl -X POST 'http://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:4445/clients' \
+ -H 'Content-Type: application/json' \
+ --data-raw '{
+   "client_id": "auth-code-client",
+   "client_name": "Test OAuth2 Client",
+   "client_secret": "secret",
+   "grant_types": ["authorization_code", "refresh_token"],
+   "redirect_uris": ["http://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:4455/dashboard"],
+   "response_types": ["code", "id_token"],
+   "scope": "openid offline",
+   "token_endpoint_auth_method": "client_secret_post",
+   "metadata": {"registration": true, "consent": true}
+}'
+
+
+curl -X POST 'http://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:4445/clients' \
+ -H 'Content-Type: application/json' \
+ --data-raw '{
+   "client_name": "Test OAuth2 Client3",
+   "grant_types": ["authorization_code", "refresh_token"],
+   "redirect_uris": ["http://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:4455/dashboard"],
+   "response_types": ["code", "id_token"],
+   "scope": "openid offline",
+   "token_endpoint_auth_method": "client_secret_post",
+   "metadata": {"registration": true, "consent": true}
+}'
+
+{"client_id":"aa95be04-6000-47c3-af53-69e683f86fb9","client_name":"Test OAuth2 Client2","client_secret":"9uMrwrzgYQRXoJRO2UhlZN0sgV","redirect_uris":["http://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:4455/dashboard"],"grant_types":["authorization_code","refresh_token"],"response_types":["code","id_token"],"scope":"openid offline","audience":[],"owner":"","policy_uri":"","allowed_cors_origins":[],"tos_uri":"","client_uri":"","logo_uri":"","contacts":null,"client_secret_expires_at":0,"subject_type":"public","jwks":{},"token_endpoint_auth_method":"client_secret_post","userinfo_signed_response_alg":"none","created_at":"2023-01-18T06:33:28Z","updated_at":"2023-01-18T06:33:28.386191Z","metadata":{"registration":true,"consent":true},"registration_access_token":"90-Z1vrE399p8GuI-WqoKbZwCzCKoQYC-bEN7rb2Xsc.VFz5R2qBLtP5z6TWU-yWWWNgXd1LejyoMntOiPyPYI4","registration_client_uri":"http://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:4444/oauth2/register/aa95be04-6000-47c3-af53-69e683f86fb9"}
+
+Testing Kratos API
+curl -s -X GET \
+    -H "Accept: application/json" \
+    http://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:4433/self-service/login/api
+output in flow_1.JSON
+
+curl -s -X GET \
+    -H "Accept: application/json" \
+    "http://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:4433/self-service/login/flows?id=ab37a95d-f3f4-4b00-b9bb-342fe3e86ccd" 
+
+
+Stop the container(s) using the following command:
+docker-compose down
+
+Delete all containers using the following command:
+docker rm -f $(docker ps -a -q)
+
+Delete all volumes using the following command:
+docker volume rm $(docker volume ls -q)
+
+Restart the containers using the following command:
+docker-compose up -d
+
+curl -X DELETE 'http://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:4445/clients/auth-code-client' \
+ -H 'Content-Type: application/json' 
+
+ curl -X GET 'http://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:4445/clients/' 
+
+ curl  'http://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:4445/clients' \
+ -H 'Content-Type: application/json' \
+ --data-raw '{
+   "client_name": "Test OAuth2 Client3",
+   "grant_types": ["authorization_code", "refresh_token"],
+   "redirect_uris": ["http://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:4455/dashboard"],
+   "response_types": ["code", "id_token"],
+   "scope": "openid offline",
+   "token_endpoint_auth_method": "client_secret_post",
+   "metadata": {"registration": true, "consent": true}
+}'
+
+docker-compose exec hydra \
+    hydra perform authorization-code \
+    --client-id auth-code-client \
+    --client-secret secret \
+    --endpoint http://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:4444/ \
+    --port 4455 \
+    --scope openid --scope offline

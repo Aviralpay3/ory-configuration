@@ -1,0 +1,90 @@
+{
+    "id": "ab37a95d-f3f4-4b00-b9bb-342fe3e86ccd",
+    "type": "api",
+    "expires_at": "2023-01-18T07:40:56.377883172Z",
+    "issued_at": "2023-01-18T07:30:56.377883172Z",
+    "request_url": "http://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:4433/self-service/login/api",
+    "ui": {
+        "action": "http://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:4433/self-service/login?flow=ab37a95d-f3f4-4b00-b9bb-342fe3e86ccd",
+        "method": "POST",
+        "nodes": [
+            {
+                "type": "input",
+                "group": "default",
+                "attributes": {
+                    "name": "csrf_token",
+                    "type": "hidden",
+                    "value": "",
+                    "required": true,
+                    "disabled": false,
+                    "node_type": "input"
+                },
+                "messages": [],
+                "meta": {}
+            },
+            {
+                "type": "input",
+                "group": "default",
+                "attributes": {
+                    "name": "identifier",
+                    "type": "text",
+                    "value": "",
+                    "required": true,
+                    "disabled": false,
+                    "node_type": "input"
+                },
+                "messages": [],
+                "meta": {
+                    "label": {
+                        "id": 1070004,
+                        "text": "ID",
+                        "type": "info"
+                    }
+                }
+            },
+            {
+                "type": "input",
+                "group": "password",
+                "attributes": {
+                    "name": "password",
+                    "type": "password",
+                    "required": true,
+                    "disabled": false,
+                    "node_type": "input"
+                },
+                "messages": [],
+                "meta": {
+                    "label": {
+                        "id": 1070001,
+                        "text": "Password",
+                        "type": "info"
+                    }
+                }
+            },
+            {
+                "type": "input",
+                "group": "password",
+                "attributes": {
+                    "name": "method",
+                    "type": "submit",
+                    "value": "password",
+                    "disabled": false,
+                    "node_type": "input"
+                },
+                "messages": [],
+                "meta": {
+                    "label": {
+                        "id": 1010001,
+                        "text": "Sign in",
+                        "type": "info",
+                        "context": {}
+                    }
+                }
+            }
+        ]
+    },
+    "created_at": "2023-01-18T07:30:56.390066Z",
+    "updated_at": "2023-01-18T07:30:56.390066Z",
+    "refresh": false,
+    "requested_aal": "aal1"
+}
