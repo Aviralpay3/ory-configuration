@@ -192,3 +192,32 @@ docker-compose exec hydra \
     --endpoint http://ec2-13-126-102-157.ap-south-1.compute.amazonaws.com:4444/ \
     --port 4455 \
     --scope openid --scope offline
+
+
+https://github.com/ory/kratos/tree/master/test/e2e/run.sh
+
+ hydra_client=$(hydra create oauth2-client \
+    --endpoint http://localhost:4445 \
+    --grant-type authorization_code --grant-type refresh_token \
+    --response-type code --response-type id_token \
+    --scope openid --scope offline \
+    --redirect-uri http://localhost:4455/self-service/methods/oidc/callback/hydra \
+    --format json)
+  export OIDC_HYDRA_CLIENT_ID=$(jq -r '.client_id' <<< "$hydra_client" )
+  export OIDC_HYDRA_CLIENT_SECRET=$(jq -r '.client_secret' <<< "$hydra_client" )
+
+  // creates hydra client and stores value in variables 
+
+https://github.com/ory/kratos/tree/master/test/e2e/profiles/oidc/.kratos.yml
+
+   id: hydra
+            label: Ory
+            provider: generic
+            client_id: ${OIDC_HYDRA_CLIENT_ID}
+            client_secret: ${OIDC_HYDRA_CLIENT_SECRET}
+            issuer_url: http://localhost:4444/
+            scope:
+              - offline
+            mapper_url: file://test/e2e/profiles/oidc/hydra.jsonnet
+
+  // sample kratos selfservice UI config 
